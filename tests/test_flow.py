@@ -11,19 +11,19 @@ WORKER_ADDR = "0x79Fa9D791601aA0EAB2da6db50DBFdcb5dCc0DAc" # Using MetaMask addr
 BASE_URL = "http://127.0.0.1:8000"
 
 
-# def test_01_create_escrow():
-#     print(f"\n💰 Phase 1: Creating Escrow for {SHARED_PAYMENT_ID}")
-#     # In a real app, you'd have an endpoint for this
-#     # For now, let's assume we call a 'setup' endpoint or use the client directly
-#     payload = {
-#         "payment_id": SHARED_PAYMENT_ID,
-#         "worker_address": WORKER_ADDR,
-#         "amount": 0.001 
-#     }
-#     # (Assuming you add a POST /create-payment endpoint in main.py)
-#     response = httpx.post(f"{BASE_URL}/create-payment", json=payload, timeout=60.0)
-#     assert response.status_code == 200
-#     print(f"Escrow Hash: {response.json()['tx_hash']}")
+def test_01_create_escrow():
+    print(f"\n💰 Phase 1: Creating Escrow for {SHARED_PAYMENT_ID}")
+    # In a real app, you'd have an endpoint for this
+    # For now, let's assume we call a 'setup' endpoint or use the client directly
+    payload = {
+        "payment_id": SHARED_PAYMENT_ID,
+        "worker_address": WORKER_ADDR,
+        "amount": 0.001 
+    }
+    # (Assuming you add a POST /create-payment endpoint in main.py)
+    response = httpx.post(f"{BASE_URL}/create-payment", json=payload, timeout=60.0)
+    assert response.status_code == 200
+    print(f"Escrow Hash: {response.json()['tx_hash']}")
 
 def test_fraud_scenario():
     print("\n Testing Scenario: BOT DETECTION (Fast Submission)")

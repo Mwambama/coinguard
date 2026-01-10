@@ -70,24 +70,24 @@ class Web3Client:
         
         return self.w3.to_hex(tx_hash)
     
-    # def create_payment(self, payment_id_hex, worker_address, amount_in_eth):
-    #     p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
-    #     nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
+    def create_payment(self, payment_id_hex, worker_address, amount_in_eth):
+        p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
+        nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
         
-    #     # Convert ETH to Wei
-    #     value_in_wei = self.w3.to_wei(amount_in_eth, 'ether')
+        # Convert ETH to Wei
+        value_in_wei = self.w3.to_wei(amount_in_eth, 'ether')
         
-    #     txn = self.contract.functions.createPayment(
-    #         p_id_bytes, 
-    #         self.w3.to_checksum_address(worker_address)
-    #     ).build_transaction({
-    #         'chainId': 11155111,
-    #         'gas': 300000,
-    #         'gasPrice': self.w3.eth.gas_price,
-    #         'nonce': nonce,
-    #         'value': value_in_wei # This sends the "money" to the contract
-    #     })
+        txn = self.contract.functions.createPayment(
+            p_id_bytes, 
+            self.w3.to_checksum_address(worker_address)
+        ).build_transaction({
+            'chainId': 11155111,
+            'gas': 300000,
+            'gasPrice': self.w3.eth.gas_price,
+            'nonce': nonce,
+            'value': value_in_wei # This sends the "money" to the contract
+        })
 
-    #     signed_txn = self.w3.eth.account.sign_transaction(txn, self.private_key)
-    #     tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-    #     return self.w3.to_hex(tx_hash)
+        signed_txn = self.w3.eth.account.sign_transaction(txn, self.private_key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        return self.w3.to_hex(tx_hash)
