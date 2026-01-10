@@ -70,24 +70,29 @@ class Web3Client:
         
         return self.w3.to_hex(tx_hash)
     
-    def create_payment(self, payment_id_hex, worker_address, amount_in_eth):
+    def create_payment(self, payment_id_hex, worker_address, amount_mnee, task_id):
+        """
+        Locks MNEE tokens into the contract vault.
+        Note: You must call 'approve' on the MNEE token contract FIRST!
+        """
         p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
         nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
         
-        # Convert ETH to Wei
-        value_in_wei = self.w3.to_wei(amount_in_eth, 'ether')
-        
+        # 1. will be passing ALL 4 arguments required by your Solidity function:
+        # (bytes32 paymentId, address worker, uint256 amount, string memory taskId)
         txn = self.contract.functions.createPayment(
             p_id_bytes, 
-            self.w3.to_checksum_address(worker_address)
+            self.w3.to_checksum_address(worker_address),
+            int(amount_mnee), # Solidity wants uint256 (integer)
+            task_id
         ).build_transaction({
             'chainId': 11155111,
             'gas': 300000,
             'gasPrice': self.w3.eth.gas_price,
             'nonce': nonce,
-            'value': value_in_wei # This sends the "money" to the contract
+            # 'value': value_in_wei  <-- REMOVED THIS.  As i want to send MNEE, not ETH.
         })
 
-        signed_txn = self.w3.eth.account.sign_transaction(txn, self.private_key)
+        signed_txn = self.w3.eth.account.sign_transaction(txn, self.agent_account.key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
         return self.w3.to_hex(tx_hash)
