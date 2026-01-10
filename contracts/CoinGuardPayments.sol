@@ -32,6 +32,8 @@ contract CoinGuardPayments is Ownable {
     }
     function createPayment(bytes32 paymentId, address worker) external payable {
     require(msg.value > 0, "Must escrow funds");
+    require(!payments[paymentId].exists, "Payment already exists");
+    
     payments[paymentId] = Payment({
         requester: msg.sender,
         worker: worker,
