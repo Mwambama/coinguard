@@ -1,5 +1,3 @@
-// this is a "Vault." it handle MNEE (an ERC-20 token) and only allow authorized AI Agents to release funds.
-
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
@@ -18,6 +16,7 @@ contract CoinGuardPayments is Ownable {
         uint256 amount;
         Status status;
         string taskId;
+        bool exists; // Added to fix the 'exists' error
     }
 
     mapping(bytes32 => Payment) public payments;
@@ -30,29 +29,28 @@ contract CoinGuardPayments is Ownable {
     function authorizeAgent(address agent, bool status) external onlyOwner {
         authorizedAgents[agent] = status;
     }
-    function createPayment(bytes32 paymentId, address worker) external payable {
-    require(msg.value > 0, "Must escrow funds");
-    require(!payments[paymentId].exists, "Payment already exists");
-    
-    payments[paymentId] = Payment({
-        requester: msg.sender,
-        worker: worker,
-        amount: msg.value,
-        status: PaymentStatus.Escrowed,
-        exists: true
-    });
-}
 
-    function createEscrow(address worker, uint256 amount, string memory taskId) external returns (bytes32) {
-        bytes32 pId = keccak256(abi.encodePacked(msg.sender, worker, taskId, block.timestamp));
+    function createPayment(bytes32 paymentId, address worker, uint256 amount, string memory taskId) external {
+        require(amount > 0, "Amount must be > 0");
+        require(!payments[paymentId].exists, "Payment already exists");
+        
+        // Transfer MNEE from requester to this contract
         require(mneeToken.transferFrom(msg.sender, address(this), amount), "Deposit failed");
-        payments[pId] = Payment(msg.sender, worker, amount, Status.ESCROWED, taskId);
-        return pId;
+
+        payments[paymentId] = Payment({
+            requester: msg.sender,
+            worker: worker,
+            amount: amount,
+            status: Status.ESCROWED,
+            taskId: taskId,
+            exists: true
+        });
     }
 
     function settle(bytes32 pId, bool isFraud) external {
         require(authorizedAgents[msg.sender], "Unauthorized");
         Payment storage p = payments[pId];
+        require(p.exists, "Payment does not exist");
         require(p.status == Status.ESCROWED, "Already settled");
 
         if (isFraud) {
