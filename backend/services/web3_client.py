@@ -21,7 +21,7 @@ class Web3Client:
                 "AGENT_PRIVATE_KEY": self.private_key, 
                 "CONTRACT_ADDRESS": self.contract_address
             }.items() if not v]
-            raise ValueError(f"❌ Missing environment variables in .env: {', '.join(missing)}")
+            raise ValueError(f" Missing environment variables in .env: {', '.join(missing)}")
 
         # 3. Initialize Web3
         self.w3 = Web3(Web3.HTTPProvider(self.rpc_url))
@@ -30,7 +30,7 @@ class Web3Client:
         try:
             self.agent_account = self.w3.eth.account.from_key(self.private_key)
         except Exception as e:
-            raise ValueError(f"❌ Invalid AGENT_PRIVATE_KEY: {e}")
+            raise ValueError(f" Invalid AGENT_PRIVATE_KEY: {e}")
 
         # 4. Load Smart Contract Artifacts
         # We use Path(__file__) to make sure the path is correct relative to THIS file
@@ -38,7 +38,7 @@ class Web3Client:
         artifact_path = base_path / "backend" / "artifacts" / "contracts" / "CoinGuardPayments.sol" / "CoinGuardPayments.json"
         
         if not artifact_path.exists():
-            raise FileNotFoundError(f"❌ Contract artifact not found at {artifact_path}. Did you run 'npx hardhat compile'?")
+            raise FileNotFoundError(f" Contract artifact not found at {artifact_path}. Did you run 'npx hardhat compile'?")
 
         with open(artifact_path, "r") as f:
             artifact = json.load(f)
@@ -48,6 +48,8 @@ class Web3Client:
             address=self.w3.to_checksum_address(self.contract_address), 
             abi=self.abi
         )
+ 
+
 
     def settle_on_chain(self, payment_id_hex, is_fraud):
         """
@@ -67,3 +69,25 @@ class Web3Client:
         tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
         
         return self.w3.to_hex(tx_hash)
+    
+    # def create_payment(self, payment_id_hex, worker_address, amount_in_eth):
+    #     p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
+    #     nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
+        
+    #     # Convert ETH to Wei
+    #     value_in_wei = self.w3.to_wei(amount_in_eth, 'ether')
+        
+    #     txn = self.contract.functions.createPayment(
+    #         p_id_bytes, 
+    #         self.w3.to_checksum_address(worker_address)
+    #     ).build_transaction({
+    #         'chainId': 11155111,
+    #         'gas': 300000,
+    #         'gasPrice': self.w3.eth.gas_price,
+    #         'nonce': nonce,
+    #         'value': value_in_wei # This sends the "money" to the contract
+    #     })
+
+    #     signed_txn = self.w3.eth.account.sign_transaction(txn, self.private_key)
+    #     tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+    #     return self.w3.to_hex(tx_hash)

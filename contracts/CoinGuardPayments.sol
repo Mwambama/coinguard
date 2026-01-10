@@ -30,6 +30,16 @@ contract CoinGuardPayments is Ownable {
     function authorizeAgent(address agent, bool status) external onlyOwner {
         authorizedAgents[agent] = status;
     }
+    function createPayment(bytes32 paymentId, address worker) external payable {
+    require(msg.value > 0, "Must escrow funds");
+    payments[paymentId] = Payment({
+        requester: msg.sender,
+        worker: worker,
+        amount: msg.value,
+        status: PaymentStatus.Escrowed,
+        exists: true
+    });
+}
 
     function createEscrow(address worker, uint256 amount, string memory taskId) external returns (bytes32) {
         bytes32 pId = keccak256(abi.encodePacked(msg.sender, worker, taskId, block.timestamp));
