@@ -23,7 +23,7 @@ def home():
 async def handle_submission(submission: SubmissionData):
     try:
         # 1. AI Logic
-        # We convert the Pydantic object to a dict for our FraudAgent
+        # convert the Pydantic object to a dict for our FraudAgent
         risk_score = ai_brain.calculate_risk(submission.dict())
         is_fraud = risk_score >= 50
         
