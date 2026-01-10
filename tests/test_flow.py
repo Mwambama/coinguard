@@ -12,7 +12,7 @@ BASE_URL = "http://127.0.0.1:8000"
 
 
 def test_01_create_escrow():
-    print(f"\n💰 Phase 1: Creating Escrow for {SHARED_PAYMENT_ID}")
+    print(f"\n Phase 1: Creating Escrow for {SHARED_PAYMENT_ID}")
     # In a real app, you'd have an endpoint for this
     # For now, let's assume we call a 'setup' endpoint or use the client directly
     payload = {
