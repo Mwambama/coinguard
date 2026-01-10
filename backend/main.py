@@ -14,10 +14,29 @@ class SubmissionData(BaseModel):
     time_spent: int
     avg_time: int
     ip_address: str
+class CreatePaymentData(BaseModel):
+    payment_id: str
+    worker_address: str
+    amount: int  # Amount in MNEE (remember decimals!)
+    task_id: str   
 
 @app.get("/")
 def home():
     return {"message": "CoinGuard API is live"}
+
+@app.post("/create-payment")
+async def create_escrow(data: CreatePaymentData):
+    try:
+        tx_hash = blockchain_body.create_payment(
+            data.payment_id, 
+            data.worker_address, 
+            data.amount,
+            data.task_id
+        )
+        return {"status": "Success", "tx_hash": tx_hash}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
 
 @app.post("/submit-work")
 async def handle_submission(submission: SubmissionData):
