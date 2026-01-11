@@ -48,4 +48,4 @@ def test_full_blockchain_flow():
     print(f" Settlement TX: {data['transaction_hash']}")
 
     assert data['is_fraud'] is True
-    print("\n🎉 SUCCESS: The AI Agent detected the bot and reversed the payment!")
+    print("\n SUCCESS: The AI Agent detected the bot and reversed the payment!")
