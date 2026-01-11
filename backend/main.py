@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from backend.services.ai_agent import FraudAgent
 from backend.services.web3_client import Web3Client
+from pydantic import BaseModel
 
 app = FastAPI()
 ai_brain = FraudAgent()
@@ -18,7 +19,12 @@ class CreatePaymentData(BaseModel):
     payment_id: str
     worker_address: str
     amount: int  # Amount in MNEE (remember decimals!)
-    task_id: str   
+    task_id: str  
+
+    #  bridge that allows test script to give contract permission to move tokens
+    # the approve-tokens endpoint
+class ApproveData(BaseModel):
+    amount: int
 
 @app.get("/")
 def home():
@@ -64,3 +70,11 @@ async def handle_submission(submission: SubmissionData):
     # except Exception as e:
     #     raise HTTPException(status_code=500, detail=str(e))
        
+@app.post("/approve-tokens")
+async def approve_tokens(data: ApproveData):
+    try:
+        # Calls the approve_mnee method in your Web3Client
+        tx_hash = blockchain_body.approve_mnee(data.amount)
+        return {"status": "Success", "tx_hash": tx_hash}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
