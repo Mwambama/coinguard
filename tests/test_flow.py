@@ -17,7 +17,7 @@ def test_01_create_escrow():
     }
     response = httpx.post(f"{BASE_URL}/create-payment", json=payload, timeout=60.0)
     assert response.status_code == 200
-    print(f"✅ Escrow Created: {response.json()['tx_hash']}")
+    print(f" Escrow Created: {response.json()['tx_hash']}")
 
 def test_02_fraud_scenario():
     """Phase 2: Detect fraud and trigger REFUND settlement"""
