@@ -4,9 +4,7 @@ module.exports = buildModule("CoinGuardModule", (m) => {
   const coinguard = m.contract("CoinGuardPayments");
   return { coinguard };
 });
-
-const { buildModule } = require("@nomicfoundation/hardhat-ignition/modules");
-
+ß
 module.exports = buildModule("CoinGuardModule", (m) => {
   const coinguard = m.contract("CoinGuardPayments");
 
