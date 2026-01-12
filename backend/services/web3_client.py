@@ -66,7 +66,7 @@ class Web3Client:
         })
 
         signed_txn = self.w3.eth.account.sign_transaction(txn, self.agent_account.key)
-        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.raw_transaction)
         
         return self.w3.to_hex(tx_hash)
     
@@ -94,7 +94,7 @@ class Web3Client:
         })
 
         signed_txn = self.w3.eth.account.sign_transaction(txn, self.agent_account.key)
-        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.raw_transaction)
         return self.w3.to_hex(tx_hash)
 
     # Indented this so it belongs to the Web3Client class
@@ -125,7 +125,7 @@ class Web3Client:
             })
             
             signed = self.w3.eth.account.sign_transaction(txn, self.private_key)
-            tx_hash = self.w3.eth.send_raw_transaction(signed.rawTransaction)
+            tx_hash = self.w3.eth.send_raw_transaction(signed.raw_transaction)
             return self.w3.to_hex(tx_hash)
             
         except Exception as e:
