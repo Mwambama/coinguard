@@ -14,10 +14,10 @@ def test_full_blockchain_flow():
     #  APPROVE (Allow the contract to move your MNEE)
     print("\n1️ Phase 1: Approving MNEE Allowance...")
     # We call a special endpoint we'll add to main.py
-    appr_resp = httpx.post(f"{BASE_URL}/approve-tokens", json={"amount": 1000}, timeout=60)
+    appr_resp = httpx.post(f"{BASE_URL}/approve-tokens", json={"amount": 1000}, timeout=120)
     assert appr_resp.status_code == 200
     print(f" Approved! TX: {appr_resp.json()['tx_hash']}")
-    time.sleep(10) # Wait for blockchain to breathe
+    #time.sleep(10) # Wait for blockchain to breathe. | not needed after adding wait(transation) in webclient - faster
 
     # CREATE ESCROW (Lock tokens in the vault)
     print("\n2️ Phase 2: Creating Escrow...")
@@ -27,10 +27,10 @@ def test_full_blockchain_flow():
         "amount": 100,
         "task_id": "HACKATHON-TASK-001"
     }
-    escrow_resp = httpx.post(f"{BASE_URL}/create-payment", json=escrow_payload, timeout=60)
+    escrow_resp = httpx.post(f"{BASE_URL}/create-payment", json=escrow_payload, timeout=120)
     assert escrow_resp.status_code == 200
     print(f" Tokens Locked! TX: {escrow_resp.json()['tx_hash']}")
-    time.sleep(15) # Wait for confirmation
+    #time.sleep(15) # Wait for confirmation | not needed after adding wait(transation) in webclient - faster
 
     #  SUBMIT WORK & AI SETTLEMENT
     print("\n3️ Phase 3: Submitting Work (Bot Scenario)...")

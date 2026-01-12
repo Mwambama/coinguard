@@ -95,6 +95,8 @@ class Web3Client:
 
         signed_txn = self.w3.eth.account.sign_transaction(txn, self.agent_account.key)
         tx_hash = self.w3.eth.send_raw_transaction(signed_txn.raw_transaction)
+        print(f" Waiting for Escrow confirmation: {self.w3.to_hex(tx_hash)}")
+        self.w3.eth.wait_for_transaction_receipt(tx_hash)
         return self.w3.to_hex(tx_hash)
 
     # Indented this so it belongs to the Web3Client class
@@ -126,6 +128,9 @@ class Web3Client:
             
             signed = self.w3.eth.account.sign_transaction(txn, self.private_key)
             tx_hash = self.w3.eth.send_raw_transaction(signed.raw_transaction)
+            print(f" Waiting for Approval confirmation: {self.w3.to_hex(tx_hash)}")
+            # stops Python until the transaction is officially on the block
+            self.w3.eth.wait_for_transaction_receipt(tx_hash)
             return self.w3.to_hex(tx_hash)
             
         except Exception as e:
