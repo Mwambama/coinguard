@@ -61,7 +61,7 @@ class Web3Client:
         txn = self.contract.functions.settle(p_id_bytes, is_fraud).build_transaction({
             'chainId': 11155111, # Sepolia
             'gas': 300000,
-            'gasPrice': self.w3.eth.gas_price,
+            'gasPrice': int(self.w3.eth.gas_price * 1.2),
             'nonce': nonce,
         })
 
@@ -88,7 +88,7 @@ class Web3Client:
         ).build_transaction({
             'chainId': 11155111,
             'gas': 300000,
-            'gasPrice': self.w3.eth.gas_price,
+            'gasPrice': int(self.w3.eth.gas_price * 1.2),
             'nonce': nonce,
             # 'value': value_in_wei  <-- REMOVED THIS.  As i want to send MNEE, not ETH.
         })

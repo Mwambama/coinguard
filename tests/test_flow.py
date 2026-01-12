@@ -38,7 +38,8 @@ def test_full_blockchain_flow():
         "payment_id": SHARED_PAYMENT_ID,
         "worker_id": "bot_user_v1",
         "time_spent": 3, # Extreme speed = High risk
-        "avg_time": 600
+        "avg_time": 600,
+        "ip_address": "127.0.0.1" # needed ip address since main.py requires ip address, since FASTAPI was rejecting it
     }
     settle_resp = httpx.post(f"{BASE_URL}/submit-work", json=work_payload, timeout=60)
     data = settle_resp.json()
