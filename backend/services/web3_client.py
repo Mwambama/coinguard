@@ -120,26 +120,36 @@ class Web3Client:
 
 
 def approve_mnee(self, amount_mnee):
-    """
-    Grants the CoinGuard contract permission to move your MNEE tokens.
-    """
-    mnee_addr = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF"
-    # Mini ABI: just enough to call 'approve'
-    mnee_abi = [{"constant": False, "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "type": "function"}]
-    
-    mnee_contract = self.w3.eth.contract(address=mnee_addr, abi=mnee_abi)
-    nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
-    
-    txn = mnee_contract.functions.approve(
-        self.contract_address, # The 'Spender' is your CoinGuard contract
-        int(amount_mnee)
-    ).build_transaction({
-        'chainId': 11155111,
-        'gas': 100000,
-        'gasPrice': self.w3.eth.gas_price,
-        'nonce': nonce,
-    })
-    
-    signed = self.w3.eth.account.sign_transaction(txn, self.private_key)
-    tx_hash = self.w3.eth.send_raw_transaction(signed.rawTransaction)
-    return self.w3.to_hex(tx_hash)
+        """
+        Grants the CoinGuard contract permission to move your MNEE tokens.
+        """
+        try:
+            mnee_addr = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF"
+            # Standard ERC-20 ABI for 'approve'.    Mini ABI: just enough to call "approve"
+
+            mnee_abi = [{"constant": False, "inputs": [{"name": "_spender", "type": "address"}, {"name": "_value", "type": "uint256"}], "name": "approve", "outputs": [{"name": "", "type": "bool"}], "type": "function"}]
+            
+            mnee_contract = self.w3.eth.contract(address=mnee_addr, abi=mnee_abi)
+            
+            print(f"DEBUG: Approving {amount_mnee} MNEE for contract {self.contract_address}")
+            
+            nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
+            
+            txn = mnee_contract.functions.approve(
+                self.contract_address,   # The 'Spender' is in CoingGuard contract
+                int(amount_mnee)
+            ).build_transaction({
+                'chainId': 11155111,
+                'gas': 100000,
+                'gasPrice': self.w3.eth.gas_price,
+                'nonce': nonce,
+            })
+            
+            signed = self.w3.eth.account.sign_transaction(txn, self.private_key)
+            tx_hash = self.w3.eth.send_raw_transaction(signed.rawTransaction)
+            return self.w3.to_hex(tx_hash)
+            
+        except Exception as e:
+            print(f" BLOCKCHAIN ERROR: {str(e)}")
+            raise e
+
