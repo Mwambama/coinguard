@@ -55,35 +55,42 @@
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
+import joblib  #for saving/loading
 import os
 
 class FraudAgent:
     def __init__(self):
-        self.model = RandomForestClassifier(n_estimators=100)
-        self._train_initial_model() # Give the AI a starting "brain"
+        self.model_path = "backend/services/fraud_model.joblib"
+        self.model = None
+        
+        # Check if a saved model already exists
+        if os.path.exists(self.model_path):
+            print("AI Agent: Loading existing model from disk...")
+            self.model = joblib.load(self.model_path) # Load instantly
+        else:
+            print("AI Agent: No model found. Training new model...")
+            self._train_and_save_model()
 
-    def _train_initial_model(self):
-        """Generates synthetic data to train the model for the demo."""
-        # Features: [time_spent, avg_time, is_suspicious_ip]
-        # 0 = Human, 1 = Bot
+    def _train_and_save_model(self):
+        """Trains the initial model and persists it to a file."""
+        # Synthetic Training Data
         data = [
-            [600, 600, 0, 0],  # Normal Human
-            [450, 600, 0, 0],  # Fast Human
-            [5, 600, 1, 1],    # Obvious Bot
-            [10, 600, 0, 1],   # Fast Bot
-            [550, 600, 1, 0],  # Human on VPN (maybe)
-            [1, 600, 1, 1]     # Extreme Bot
+            [600, 600, 0, 0], [450, 600, 0, 0], # Human : there is normal than fast human
+            [1, 600, 1, 1],   [5, 600, 1, 1]    # Bot
         ]
         df = pd.DataFrame(data, columns=['time_spent', 'avg_time', 'suspicious_ip', 'target'])
-        
         X = df[['time_spent', 'avg_time', 'suspicious_ip']]
         y = df['target']
+        
+        self.model = RandomForestClassifier(n_estimators=100)
         self.model.fit(X, y)
-        print(" AI Agent: Scikit-learn model trained and ready.")
+        
+        # Save the model to a file so it persists
+        joblib.dump(self.model, self.model_path)
+        print(f"AI Agent: Model saved to {self.model_path}")
 
     def calculate_risk(self, data):
-        """Uses the ML model to predict fraud probability."""
-        # Prepares the features from the incoming request
+        """Uses the persisted ML model to predict fraud."""
         is_suspicious_ip = 1 if data.get('ip_address') == '1.2.3.4' else 0
         features = np.array([[
             data.get('time_spent', 0),
@@ -91,10 +98,5 @@ class FraudAgent:
             is_suspicious_ip
         ]])
         
-        # predict_proba returns [prob_human, prob_bot]
-        # We take the prob_bot (index 1) and turn it into a 0-100 score
         risk_prob = self.model.predict_proba(features)[0][1]
-        risk_score = float(risk_prob * 100)
-        
-        print(f" AI Inference: Risk Score {risk_score}%")
-        return risk_score
+        return float(risk_prob * 100)
