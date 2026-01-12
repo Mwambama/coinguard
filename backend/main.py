@@ -72,9 +72,6 @@ async def handle_submission(submission: SubmissionData):
        
 @app.post("/approve-tokens")
 async def approve_tokens(data: ApproveData):
-    try:
-        # Calls the approve_mnee method in your Web3Client
-        tx_hash = blockchain_body.approve_mnee(data.amount)
-        return {"status": "Success", "tx_hash": tx_hash}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    # This calls the method I just updated in web3_client.py
+    tx_hash = blockchain_body.approve_mnee(data.amount)
+    return {"status": "Success", "tx_hash": tx_hash}
