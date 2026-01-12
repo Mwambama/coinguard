@@ -56,7 +56,7 @@ class Web3Client:
         Executes the 'settle' function on the smart contract.
         """
         p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
-        nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
+        nonce = self.w3.eth.get_transaction_count(self.agent_account.address, 'pending')
         
         txn = self.contract.functions.settle(p_id_bytes, is_fraud).build_transaction({
             'chainId': 11155111, # Sepolia
@@ -76,7 +76,7 @@ class Web3Client:
         Note: You must call 'approve' on the MNEE token contract FIRST!
         """
         p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
-        nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
+        nonce = self.w3.eth.get_transaction_count(self.agent_account.address, 'pending')
         
         # 1. will be passing ALL 4 arguments required by your Solidity function:
         # (bytes32 paymentId, address worker, uint256 amount, string memory taskId)
@@ -112,7 +112,7 @@ class Web3Client:
             
             print(f"DEBUG: Approving {amount_mnee} MNEE for contract {self.contract_address}")
             
-            nonce = self.w3.eth.get_transaction_count(self.agent_account.address)
+            nonce = self.w3.eth.get_transaction_count(self.agent_account.address, 'pending')
             
             txn = mnee_contract.functions.approve(
                 self.contract_address,   # The 'Spender' is in CoingGuard contract
