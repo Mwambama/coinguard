@@ -120,7 +120,7 @@ class Web3Client:
             ).build_transaction({
                 'chainId': 11155111,
                 'gas': 100000,
-                'gasPrice': self.w3.eth.gas_price,
+                'gasPrice': int(self.w3.eth.gas_price * 1.2),
                 'nonce': nonce,
             })
             
