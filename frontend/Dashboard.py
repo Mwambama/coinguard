@@ -2,6 +2,17 @@ import streamlit as st
 import httpx
 import pandas as pd
 import time
+import os
+from dotenv import load_dotenv
+
+
+# Load the .env file from the root directory
+load_dotenv() 
+CONTRACT_ADDRESS = os.getenv("CONTRACT_ADDRESS")
+
+# In the Metrics section, use the variable:
+st.metric(label="Vault Address", value=f"{CONTRACT_ADDRESS[:6]}...{CONTRACT_ADDRESS[-4:]}")
+
 
 # Page Config
 st.set_page_config(page_title="CoinGuard AI Dashboard", layout="wide", page_icon="🛡️")
@@ -9,7 +20,7 @@ st.set_page_config(page_title="CoinGuard AI Dashboard", layout="wide", page_icon
 st.title("CoinGuard: AI Fraud Detection & Smart Settlement")
 st.markdown("### Real-time Monitoring of AI Agent Decisions and Blockchain Transactions")
 
-# --- System Overview Metrics ---
+# --- System Metrics ---
 col1, col2, col3 = st.columns(3)
 with col1:
     st.metric(label="API Status", value="Connected", delta="Healthy")
