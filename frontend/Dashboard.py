@@ -90,7 +90,7 @@ with col4:
 st.caption(f"Connected Vault Address: `{CONTRACT_ADDRESS}`")
 st.divider()
 
-# --- Add this right below your Metrics ---
+# below metrics
 if not df_logs.empty:
     latest_score = df_logs.iloc[-1]['risk_score']
     draw_risk_gauge(latest_score)
