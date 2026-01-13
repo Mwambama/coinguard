@@ -23,6 +23,7 @@ def get_vault_balance():
         mnee_addr = "0x8ccedbAe4916b79da7F3F612EfB2EB93A2bFD6cF"
         abi = [{"constant":True,"inputs":[{"name":"_owner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"type":"function"}]
         token_contract = blockchain.w3.eth.contract(address=mnee_addr, abi=abi)
+        # Use your actual contract address from .env
         balance = token_contract.functions.balanceOf(CONTRACT_ADDRESS).call()
         return balance
     except Exception as e:
@@ -31,7 +32,7 @@ def get_vault_balance():
 def calculate_total_prevented(df):
     """Calculates sum of MNEE for all transactions marked as FRAUD."""
     if not df.empty and 'verdict' in df.columns:
-        # In my demo, each escrow is 100 MNEE
+        # Each demo escrow is 100 MNEE
         fraud_entries = df[df['verdict'] == 'FRAUD']
         return len(fraud_entries) * 100
     return 0
@@ -70,27 +71,23 @@ except:
 
 # 4. Metrics Section (4 Columns)
 col1, col2, col3, col4 = st.columns(4)
-
 with col1:
     st.metric(label="API Status", value="Connected", delta="Healthy")
-
 with col2:
-    # Vault Balance: matching what you see in the ERC-20 Token Txns tab
+    # Live vault balance matching Etherscan
     live_bal = get_vault_balance()
     st.metric(label="Vault Balance", value=f"{live_bal} MNEE")
-
 with col3:
-    # Total Fraud Prevented: Ticks up by 100 every time AI blocks a bot
+    # Counter ticks up by 100 per fraud block
     total_saved = calculate_total_prevented(df_logs)
     st.metric(label="Total Fraud Prevented", value=f"{total_saved} MNEE", delta="Shield Active")
-
 with col4:
     st.metric(label="Network", value="Sepolia Testnet")
 
 st.caption(f"Connected Vault Address: `{CONTRACT_ADDRESS}`")
 st.divider()
 
-# below metrics
+# --- Risk Gauge Visualization ---
 if not df_logs.empty:
     latest_score = df_logs.iloc[-1]['risk_score']
     draw_risk_gauge(latest_score)
@@ -98,7 +95,7 @@ else:
     draw_risk_gauge(0)
 
 # --- Live Feed ---
-st.subheader(" AI Agent Activity")
+st.subheader("AI Agent Activity")
 
 def get_status():
     try:
@@ -112,11 +109,9 @@ if st.sidebar.button("Refresh System Data"):
 
 st.info(f"System Backend Status: {get_status()}")
 
-# 5. Transaction History (Real Logic)
+# 5. Transaction History (Live Logic)
 st.subheader("Transaction History")
-
 if not df_logs.empty:
-    # Create Etherscan links
     if 'transaction_hash' in df_logs.columns:
         df_logs['Etherscan'] = df_logs['transaction_hash'].apply(
             lambda x: f"https://sepolia.etherscan.io/tx/{x}" if x else "N/A"
