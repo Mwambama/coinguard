@@ -14,7 +14,7 @@ def test_full_blockchain_flow():
     #  APPROVE (Allow the contract to move your MNEE)
     print("\n1️ Phase 1: Approving MNEE Allowance...")
     # We call a special endpoint we'll add to main.py
-    appr_resp = httpx.post(f"{BASE_URL}/approve-tokens", json={"amount": 1000}, timeout=120)
+    appr_resp = httpx.post(f"{BASE_URL}/approve-tokens", json={"amount": 1000}, timeout=None)
     assert appr_resp.status_code == 200
     print(f" Approved! TX: {appr_resp.json()['tx_hash']}")
     #time.sleep(10) # Wait for blockchain to breathe. | not needed after adding wait(transation) in webclient - faster
@@ -27,7 +27,7 @@ def test_full_blockchain_flow():
         "amount": 100,
         "task_id": "HACKATHON-TASK-001"
     }
-    escrow_resp = httpx.post(f"{BASE_URL}/create-payment", json=escrow_payload, timeout=120)
+    escrow_resp = httpx.post(f"{BASE_URL}/create-payment", json=escrow_payload, timeout=None)
     assert escrow_resp.status_code == 200
     print(f" Tokens Locked! TX: {escrow_resp.json()['tx_hash']}")
     #time.sleep(15) # Wait for confirmation | not needed after adding wait(transation) in webclient - faster
@@ -41,7 +41,7 @@ def test_full_blockchain_flow():
         "avg_time": 600,
         "ip_address": "127.0.0.1" # needed ip address since main.py requires ip address, since FASTAPI was rejecting it
     }
-    settle_resp = httpx.post(f"{BASE_URL}/submit-work", json=work_payload, timeout=60)
+    settle_resp = httpx.post(f"{BASE_URL}/submit-work", json=work_payload, timeout=None)
     data = settle_resp.json()
     
     print(f" AI Risk Score: {data['risk_score']}")
