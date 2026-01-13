@@ -4,6 +4,7 @@ import pandas as pd
 import os
 from dotenv import load_dotenv
 from backend.services.web3_client import Web3Client
+import plotly.graph_objects as go
 
 # 1. Page Config (Must be first)
 st.set_page_config(page_title="CoinGuard AI Dashboard", layout="wide", page_icon="🛡️")
@@ -34,6 +35,27 @@ def calculate_total_prevented(df):
         fraud_entries = df[df['verdict'] == 'FRAUD']
         return len(fraud_entries) * 100
     return 0
+
+def draw_risk_gauge(score):
+    """Creates a professional Green-to-Red Gauge."""
+    fig = go.Figure(go.Indicator(
+        mode = "gauge+number",
+        value = score,
+        domain = {'x': [0, 1], 'y': [0, 1]},
+        title = {'text': "Current Submission Risk Level", 'font': {'size': 24}},
+        gauge = {
+            'axis': {'range': [None, 100], 'tickwidth': 1, 'tickcolor': "darkblue"},
+            'bar': {'color': "black"},
+            'bgcolor': "white",
+            'borderwidth': 2,
+            'bordercolor': "gray",
+            'steps': [
+                {'range': [0, 40], 'color': 'green'},
+                {'range': [40, 70], 'color': 'yellow'},
+                {'range': [70, 100], 'color': 'red'}],
+        }
+    ))
+    st.plotly_chart(fig, use_container_width=True)
 
 # --- Header ---
 st.title("CoinGuard: AI Fraud Detection & Smart Settlement")
@@ -67,6 +89,13 @@ with col4:
 
 st.caption(f"Connected Vault Address: `{CONTRACT_ADDRESS}`")
 st.divider()
+
+# --- Add this right below your Metrics ---
+if not df_logs.empty:
+    latest_score = df_logs.iloc[-1]['risk_score']
+    draw_risk_gauge(latest_score)
+else:
+    draw_risk_gauge(0)
 
 # --- Live Feed ---
 st.subheader(" AI Agent Activity")
