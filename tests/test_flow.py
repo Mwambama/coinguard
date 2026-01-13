@@ -43,6 +43,11 @@ def test_full_blockchain_flow():
     }
     settle_resp = httpx.post(f"{BASE_URL}/submit-work", json=work_payload, timeout=None)
     data = settle_resp.json()
+
+    # SAFETY CHECK: If the blockchain failed, don't crash the test script
+    if data.get("status") == "Error":
+        print(f" Settlement Failed On-Chain: {data.get('error_detail')}")
+        pytest.fail(f"Test aborted because blockchain reverted.")
     
     print(f" AI Risk Score: {data['risk_score']}")
     print(f" Fraud Verdict: {data['is_fraud']}")
