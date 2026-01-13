@@ -30,13 +30,13 @@ def get_vault_balance():
 def calculate_total_prevented(df):
     """Calculates sum of MNEE for all transactions marked as FRAUD."""
     if not df.empty and 'verdict' in df.columns:
-        # In our demo, each escrow is 100 MNEE
+        # In my demo, each escrow is 100 MNEE
         fraud_entries = df[df['verdict'] == 'FRAUD']
         return len(fraud_entries) * 100
     return 0
 
 # --- Header ---
-st.title("🛡️ CoinGuard: AI Fraud Detection & Smart Settlement")
+st.title("CoinGuard: AI Fraud Detection & Smart Settlement")
 st.markdown("### Real-time Monitoring of AI Agent Decisions and Blockchain Transactions")
 
 # 3. Fetch Data for Metrics
@@ -69,7 +69,7 @@ st.caption(f"Connected Vault Address: `{CONTRACT_ADDRESS}`")
 st.divider()
 
 # --- Live Feed ---
-st.subheader("🤖 AI Agent Activity")
+st.subheader(" AI Agent Activity")
 
 def get_status():
     try:
@@ -84,7 +84,7 @@ if st.sidebar.button("Refresh System Data"):
 st.info(f"System Backend Status: {get_status()}")
 
 # 5. Transaction History (Real Logic)
-st.subheader("📋 Transaction History")
+st.subheader("Transaction History")
 
 if not df_logs.empty:
     # Create Etherscan links
