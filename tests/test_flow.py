@@ -30,14 +30,14 @@ def test_full_blockchain_flow():
     escrow_resp = httpx.post(f"{BASE_URL}/create-payment", json=escrow_payload, timeout=None)
     assert escrow_resp.status_code == 200
     print(f" Tokens Locked! TX: {escrow_resp.json()['tx_hash']}")
-    #time.sleep(15) # Wait for confirmation | not needed after adding wait(transation) in webclient - faster
+    time.sleep(5) # Wait for confirmation | not needed after adding wait(transation) in webclient - faster
 
     #  SUBMIT WORK & AI SETTLEMENT
     print("\n3️ Phase 3: Submitting Work (Bot Scenario)...")
     work_payload = {
         "payment_id": SHARED_PAYMENT_ID,
         "worker_id": "bot_user_v1",
-        "time_spent": 1, # Extreme speed = High risk | changed from 3 to 1 to force a higher risk score since AI sees 3sec "mid risk(40), is below 50 threshold"
+        "time_spent": .5, # Extreme speed = High risk | changed from 3 to 1 to force a higher risk score since AI sees 3sec "mid risk(40), is below 50 threshold"
         "avg_time": 600,
         "ip_address": "127.0.0.1" # needed ip address since main.py requires ip address, since FASTAPI was rejecting it
     }

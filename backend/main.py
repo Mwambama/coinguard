@@ -56,7 +56,7 @@ async def handle_submission(submission: SubmissionData):
         # 1. AI Logic
         # convert the Pydantic object to a dict for our FraudAgent
         risk_score = ai_brain.calculate_risk(submission.dict())
-        is_fraud = risk_score >= 50
+        is_fraud = risk_score >= 40
         
         # 2. Blockchain Logic
         tx_hash = blockchain_body.settle_on_chain(submission.payment_id, is_fraud)
