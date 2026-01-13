@@ -50,6 +50,69 @@ class Web3Client:
         )
  
 
+    # def create_payment(self, payment_id_hex, worker_address, amount_mnee, task_id):
+    #     """
+    #     Locks MNEE tokens into the contract vault.
+    #     Note: You must call 'approve' on the MNEE token contract FIRST!
+    #     """
+    #     p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
+    #     nonce = self.w3.eth.get_transaction_count(self.agent_account.address, 'pending')
+        
+    #     # 1. will be passing ALL 4 arguments required by your Solidity function:
+    #     # (bytes32 paymentId, address worker, uint256 amount, string memory taskId)
+    #     txn = self.contract.functions.createPayment(
+    #         p_id_bytes, 
+    #         self.w3.to_checksum_address(worker_address),
+    #         int(amount_mnee), # Solidity wants uint256 (integer)
+    #         task_id
+    #     ).build_transaction({
+    #         'chainId': 11155111,
+    #         'gas': 300000,
+    #         'gasPrice': int(self.w3.eth.gas_price * 1.2),
+    #         'nonce': nonce,
+    #         # 'value': value_in_wei  <-- REMOVED THIS.  As i want to send MNEE, not ETH.
+    #     })
+
+
+    #     signed_txn = self.w3.eth.account.sign_transaction(txn, self.agent_account.key)
+    #     tx_hash = self.w3.eth.send_raw_transaction(signed_txn.raw_transaction)
+    #     print(f" Waiting for Escrow confirmation: {self.w3.to_hex(tx_hash)}")
+    #     #self.w3.eth.wait_for_transaction_receipt(tx_hash)
+    #     receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+
+    #     # CHECK: If status is 0, the blockchain rejected  logic
+    #     if receipt.status == 0:
+    #         raise ValueError(f"Blockchain Revert: createPayment failed. Hash: {self.w3.to_hex(tx_hash)}")
+        
+    #     return self.w3.to_hex(tx_hash)
+    
+
+    def settle_on_chain(self, payment_id_hex, is_fraud):
+        """
+        Executes the 'settle' function on the smart contract.
+        """
+        p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
+        nonce = self.w3.eth.get_transaction_count(self.agent_account.address, 'pending')
+        
+        txn = self.contract.functions.settle(p_id_bytes, is_fraud).build_transaction({
+            'chainId': 11155111, # Sepolia
+            'gas': 300000,
+            'gasPrice': int(self.w3.eth.gas_price * 1.2),
+            'nonce': nonce,
+        })
+
+        signed_txn = self.w3.eth.account.sign_transaction(txn, self.agent_account.key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.raw_transaction)
+
+        print(f"Waiting for Settlement confirmation: {self.w3.to_hex(tx_hash)}")
+        receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+
+        # CHECK: If status is 0, 'Payment does not exist' or 'Unauthorized'
+        if receipt.status == 0:
+            raise ValueError(f"Blockchain Revert: settle failed. Hash: {self.w3.to_hex(tx_hash)}")
+        
+        return self.w3.to_hex(tx_hash)
+    
     def create_payment(self, payment_id_hex, worker_address, amount_mnee, task_id):
         """
         Locks MNEE tokens into the contract vault.
@@ -83,33 +146,6 @@ class Web3Client:
         # CHECK: If status is 0, the blockchain rejected  logic
         if receipt.status == 0:
             raise ValueError(f"Blockchain Revert: createPayment failed. Hash: {self.w3.to_hex(tx_hash)}")
-        
-        return self.w3.to_hex(tx_hash)
-    
-
-    def settle_on_chain(self, payment_id_hex, is_fraud):
-        """
-        Executes the 'settle' function on the smart contract.
-        """
-        p_id_bytes = self.w3.to_bytes(hexstr=payment_id_hex)
-        nonce = self.w3.eth.get_transaction_count(self.agent_account.address, 'pending')
-        
-        txn = self.contract.functions.settle(p_id_bytes, is_fraud).build_transaction({
-            'chainId': 11155111, # Sepolia
-            'gas': 300000,
-            'gasPrice': int(self.w3.eth.gas_price * 1.2),
-            'nonce': nonce,
-        })
-
-        signed_txn = self.w3.eth.account.sign_transaction(txn, self.agent_account.key)
-        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.raw_transaction)
-
-        print(f"Waiting for Settlement confirmation: {self.w3.to_hex(tx_hash)}")
-        receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-
-        # CHECK: If status is 0, 'Payment does not exist' or 'Unauthorized'
-        if receipt.status == 0:
-            raise ValueError(f"Blockchain Revert: settle failed. Hash: {self.w3.to_hex(tx_hash)}")
         
         return self.w3.to_hex(tx_hash)
     

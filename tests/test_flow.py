@@ -20,17 +20,40 @@ def test_full_blockchain_flow():
     #time.sleep(10) # Wait for blockchain to breathe. | not needed after adding wait(transation) in webclient - faster
 
     # CREATE ESCROW (Lock tokens in the vault)
+    # print("\n2️ Phase 2: Creating Escrow...")
+    # escrow_payload = {
+    #     "payment_id": SHARED_PAYMENT_ID,
+    #     "worker_address": WORKER_ADDR,
+    #     "amount": 100,
+    #     "task_id": "HACKATHON-TASK-001"
+    # }
+    # escrow_resp = httpx.post(f"{BASE_URL}/create-payment", json=escrow_payload, timeout=None)
+    # assert escrow_resp.status_code == 200
+    # print(f" Tokens Locked! TX: {escrow_resp.json()['tx_hash']}")
+    # time.sleep(5)  Wait for confirmation | not needed after adding wait(transation) in webclient - faster
+
+
+    # 2. CREATE ESCROW
     print("\n2️ Phase 2: Creating Escrow...")
+
     escrow_payload = {
         "payment_id": SHARED_PAYMENT_ID,
         "worker_address": WORKER_ADDR,
         "amount": 100,
         "task_id": "HACKATHON-TASK-001"
     }
+    
     escrow_resp = httpx.post(f"{BASE_URL}/create-payment", json=escrow_payload, timeout=None)
+    data = escrow_resp.json()
+    
+    if data.get("status") == "Error":
+        print(f" BLOCKCHAIN REVERT: {data.get('error_detail')}")
+        pytest.fail(f"Escrow failed: {data.get('error_detail')}")
+    
     assert escrow_resp.status_code == 200
-    print(f" Tokens Locked! TX: {escrow_resp.json()['tx_hash']}")
-    time.sleep(5) # Wait for confirmation | not needed after adding wait(transation) in webclient - faster
+    print(f" Tokens Locked! TX: {data['tx_hash']}")
+
+
 
     #  SUBMIT WORK & AI SETTLEMENT
     print("\n3️ Phase 3: Submitting Work (Bot Scenario)...")

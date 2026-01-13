@@ -48,7 +48,9 @@ async def create_escrow(data: CreatePaymentData):
         )
         return {"status": "Success", "tx_hash": tx_hash}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        #raise HTTPException(status_code=500, detail=str(e))
+        # returns actual error string instead of crashing with a 500
+        return {"status": "Error", "error_detail": str(e)}
 
 @app.post("/submit-work")
 async def handle_submission(submission: SubmissionData):
